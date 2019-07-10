@@ -48,7 +48,7 @@ resource "aws_instance" "stadevtest2" {
 resource "aws_key_pair" "deployerkey" {
   key_name = "deployer-key"
 # add real key
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAAp9gwM5n67C5EqtMwfyTRdPFA5wPCebcsQWfM4p37wW3Dj7eXHm8yVvAeLsXg7RnuOba2safsPLVACYHsJRfAdSh3jrLiaTLXNfsCET295NEhEshcNwxBYY8kmdTUIXgmXceDF+PiNCC5lOLjObwPUvScff9kdZI3Hx47eWL3esI+l9ohZy3b3acHTTxJBWrVsInsTnZST17G7APQW8JGkdhWIxzuvr9e92e3gpNn testdemo"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2sPLVACYHsJRfAdxccfghghdfityiik8979wPUvScff9kdZI3Hx47eWL3esI+l9ohZ7G7APQW8JGkdhgpNn testdemo"
 }
 
 # create and attach a profile to this instance
