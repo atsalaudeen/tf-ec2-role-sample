@@ -7,14 +7,16 @@ provider "aws" {
 resource "aws_instance" "stadevtest2" {
   ami = "ami-0b898040803850657"
   instance_type = "t2.micro"
-  #vpc_security_group_ids = ["sg-065b8a2a1a0552b3d"]
   vpc_security_group_ids = ["${aws_security_group.testssh2.id}"]
 
   # use this to attach existing role
   #iam_instance_profile = "tfadmin"
   
-  #key_name = "${aws_key_pair.deployerkey.key_name"
-  key_name = "deployer-key"
+  # use if creating new key below
+  #key_name = "deployer-key"
+  
+  # use for existing key
+  key_name = "testkey"
   
   # attach new profile to be created 
   iam_instance_profile = "test_profile"
@@ -30,9 +32,9 @@ resource "aws_instance" "stadevtest2" {
   # can add the following to install.sh script instead.
  user_data = <<-EOF
     #!/bin/bash
-    sudo yum install -y httpd
-    sudo yum install -y nginx
-    sudo yum install -y graphviz
+    yum install -y httpd
+    yum install -y nginx
+    yum install -y graphviz
     wget https://releases.hashicorp.com/terraform/0.12.3/terraform_0.12.3_linux_amd64.zip
     sleep 2
     unzip terraform_0.12.3_linux_amd64.zip
@@ -44,11 +46,12 @@ resource "aws_instance" "stadevtest2" {
 
 }
 
-# add ssh key to the instance 
-resource "aws_key_pair" "deployerkey" {
-  key_name = "deployer-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOANr0dEm9ikCMMfyyMygR9tzS2HPOWSp9gwM5RC5EqtMwfyTRdPFA5wPCebcsQWfM4p37wW3Dj7eXHm8yVvAeLsXg7RnuOba2IOgdAgl9hpXI947yYrW2hXn7ia0lnlN4JjAnZ4FAuN+ksWNkkQyocdkEJEImKNnNiU+Yw91UjYWsc674sPLVACYHsJRfAdSh3jrLiaTLXNfsCET295NEhEshcNwxBYY8kmdTUIXgmXceDF+PiNCC5lOLjObwPUvScff9kdZI3Hx47bAMeWL3esI+l9ohZy3b3acHTTxJBWrVsInsTnZST17G7APQW8JGkdhWIxzuvr9e92e3gpNn testdemo"
-}
+# Create keypair to add ssh key to the instance 
+# skip if already created on aws
+#resource "aws_key_pair" "deployerkey" {
+#  key_name = "deployer-key"
+#  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdPj/e8HJkSRzcJWCyHRAfq61Po0POfu33rxJiEYviGKrpWxN7G9uadfrogzrlCCesilXi3wNw641jczagDLFKmb72EYtUxnhmi8ba9ouOUnIhO6Vurifq/oep7+jkLvl8jjhgg90f2r44gabaKHKrU9jkuk0ib1mD test-only"
+#}
 
 # create and attach a profile to this instance
 
