@@ -7,6 +7,10 @@ provider "aws" {
 resource "aws_instance" "stadevtest2" {
   ami = "ami-0b898040803850657"
   instance_type = "t2.micro"
+<<<<<<< HEAD
+=======
+  
+>>>>>>> e0431d2196662110454c44ed066ab386cfcdbcc1
   vpc_security_group_ids = ["${aws_security_group.testssh2.id}"]
 
   # use this to attach existing role
@@ -46,12 +50,21 @@ resource "aws_instance" "stadevtest2" {
 
 }
 
+<<<<<<< HEAD
 # Create keypair to add ssh key to the instance 
 # skip if already created on aws
 #resource "aws_key_pair" "deployerkey" {
 #  key_name = "deployer-key"
 #  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdPj/e8HJkSRzcJWCyHRAfq61Po0POfu33rxJiEYviGKrpWxN7G9uadfrogzrlCCesilXi3wNw641jczagDLFKmb72EYtUxnhmi8ba9ouOUnIhO6Vurifq/oep7+jkLvl8jjhgg90f2r44gabaKHKrU9jkuk0ib1mD test-only"
 #}
+=======
+# add ssh key to the instance 
+resource "aws_key_pair" "deployerkey" {
+  key_name = "deployer-key"
+# add real key
+  public_key = "ssh-rsa AAAAB3NzaC1yc2sPLVACYHsJRfAdxccfghghdfityiik8979wPUvScff9kdZI3Hx47eWL3esI+l9ohZ7G7APQW8JGkdhgpNn testdemo"
+}
+>>>>>>> e0431d2196662110454c44ed066ab386cfcdbcc1
 
 # create and attach a profile to this instance
 
@@ -113,7 +126,7 @@ EOF
 }
 
 # attach read only policy 
-resource "aws_iam_role_policy_attachment" "ec2-read-only-policy-attachment" {
+resource "aws_iam_role_policy_attachment" "ec2-master-policy-attachment" {
     role = "${aws_iam_role.sta_admin_role.name}"
     policy_arn = "${aws_iam_policy.tf_policy.arn}"
 }
