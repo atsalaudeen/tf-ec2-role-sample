@@ -16,7 +16,7 @@ resource "aws_instance" "stadevtest2" {
   #key_name = "deployer-key"
   
   # use for existing key
-  key_name = "sta-acc-only"
+  key_name = "testkey"
   
   # attach new profile to be created 
   iam_instance_profile = "test_profile"
@@ -28,45 +28,21 @@ resource "aws_instance" "stadevtest2" {
   #depends_on = [aws_iam_role.sta_admin_role]
   depends_on = [aws_iam_instance_profile.test_profile]
 
-
  #user_data = "./install.sh"
   # can add the following to install.sh script instead.
-
- user_data = <<EOF
-    #! /bin/bash
-    sudo yum update -y
-    sudo amazon-linux-extras install -y php7.3
-    sudo yum install -y httpd nginx
-    php -v
-    sudo yum install -y php-soap.x86_64
-    sudo systemctl start httpd
-    sudo systemctl enable httpd
-    sudo systemctl start nginx
-    sudo systemctl enable nginx 
-    sudo mkdir -p /var/www/html/web/www
-    sudo wget https://releases.hashicorp.com/terraform/0.12.3/terraform_0.12.3_linux_amd64.zip
-    sudo unzip terraform_0.12.3_linux_amd64.zip
-    sudo cat > /var/www/html/web/www/index.html <<'_END'
-          <h1>Welcome to testing env</h1>
-          <p>
-          This is first ec2 app server. 
-        -END
+ user_data = <<-EOF
+    #!/bin/bash
+    yum install -y httpd
+    yum install -y nginx
+    yum install -y graphviz
+    wget https://releases.hashicorp.com/terraform/0.12.3/terraform_0.12.3_linux_amd64.zip
+    sleep 2
+    unzip terraform_0.12.3_linux_amd64.zip
+    cat > /home/ec2-user/test.txt <<'_END'
+	  Welcome to staging
+	  Terrafile=/home/ec2-user/tf 
+	-END
   EOF
-
-  # Local provisioner to get ip address
-  provisioner "local-exec" {
-    command = "echo ${aws_instance.stadevtest2.private_ip} >> appserver_private_ips.txt"
-  }
-
-  # Copies the myapp.conf file to /tmp/myapp.conf
-  provisioner "file" {
-    source      = "conf/myapp.conf"
-    destination = "/tmp/myapp.conf"
-  }
-
-  provisioner "local-exec" {
-    command = "echo `php -v` >> appserver_private_ips.txt"
-  }
 
 }
 
