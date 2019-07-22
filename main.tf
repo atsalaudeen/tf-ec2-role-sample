@@ -16,7 +16,7 @@ resource "aws_instance" "stadevtest2" {
   #key_name = "deployer-key"
 
   # use for existing key
-  key_name = "sta-acc-only"
+  key_name = "test-acc-only"
 
   # attach new profile to be created
   iam_instance_profile = "test_profile"
