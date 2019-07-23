@@ -3,9 +3,37 @@ provider "aws" {
   region = "us-east-1"
 }
 
+data "aws_ami" "amazon-linux-2" {
+ most_recent = true
+ #owners = ["amazon"]
+ owners = ["137112412989"]
+
+ filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+ filter {
+    name   = "image-type"
+    values = ["machine"]
+  }
+ filter {
+    name   = "is-public"
+    values = ["true"]
+  }
+ filter {
+    name   = "state"
+    values = ["available"]
+  }
+ name_regex = "^amzn2-ami-hvm-2.0*"
+}
+
+# aws image filter 
+# https://thecloudmarket.com/image/ami-0b898040803850657--amzn2-ami-hvm-2-0-20190618-x86-64-gp2
 
 resource "aws_instance" "stadevtest2" {
-  ami = "ami-0b898040803850657"
+  #ami = "ami-0b898040803850657"
+  # to use latest amazon linux 2 ami 
+  ami      = "${data.aws_ami.amazon-linux-2.id}"
   instance_type = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.testappserver1-sg.id}"]
 
