@@ -1,5 +1,5 @@
 # Null resourse that Copies the apache config, index.html to server and restarts apache
-  resource "null_resource" "provision_webserver3" {
+  resource "null_resource" "provision_webserver5" {
     connection {
         type        = "ssh"
         user        = "ec2-user"

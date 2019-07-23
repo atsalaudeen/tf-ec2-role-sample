@@ -44,7 +44,7 @@ resource "aws_instance" "stadevtest2" {
   #key_name = "deployer-key"
 
   # use for existing key
-  key_name = "test-acc-only"
+  key_name = "sta-acc-only"
 
   # attach new profile to be created
   iam_instance_profile = "test_profile"
@@ -61,18 +61,19 @@ resource "aws_instance" "stadevtest2" {
   # can add the following to install.sh script instead.
 
  user_data = <<EOF
-    #! /bin/bash
-    sudo yum update -y
-    sudo amazon-linux-extras install -y php7.3
-    sudo yum install -y httpd php gd php-gd php-xml php-json php-mbstring php-process php-common php-zip php-mysqlnd php-opcache
-    #php -v
-    sudo yum install -y nfs-utils
-    sudo yum install -y cachefilesd
-    sudo yum install -y java-1.8.0-openjdk.x86_64
-    sudo yum install -y php-soap.x86_64
-    sudo service cachefilesd start
-    sudo chkconfig cachefilesd on
-    sudo mkdir -p /var/www/html/web/www
+	#! /bin/bash
+	sudo yum update -y
+	#sudo amazon-linux-extras install -y php7.3
+	#sudo yum install -y httpd php gd php-gd php-xml php-json php-mbstring php-process php-common php-zip php-mysqlnd php-opcache
+	sudo yum install -y httpd
+	#php -v
+	#sudo yum install -y nfs-utils
+	#sudo yum install -y cachefilesd
+	#sudo yum install -y java-1.8.0-openjdk.x86_64
+	#sudo yum install -y php-soap.x86_64
+	#sudo service cachefilesd start
+	#sudo chkconfig cachefilesd on
+	sudo mkdir -p /var/www/html/web/www
 
     # This is just a demo. We use provisioner later 
     sudo cat > /var/www/html/web/www/index.test <<'_END'
@@ -93,8 +94,11 @@ resource "aws_instance" "stadevtest2" {
           
             </body>
           </html>
-        -END
+    _END
 
+    sudo systemctl start httpd
+
+    sudo systemctl enable httpd.service
   EOF
 
   # Local provisioner to get ip address
@@ -104,50 +108,6 @@ resource "aws_instance" "stadevtest2" {
 
 }
 
-# Null resourse that Copies the apache config, index.html to server and restarts apache
-  resource "null_resource" "provision_webserver1" {
-    connection {
-        type        = "ssh"
-        user        = "ec2-user"
-        #private_key = "${var.private_key}"
-        private_key = "${file("/home/ec2-user/.ssh/test.pem")}"
-        host = "${aws_instance.stadevtest2.public_ip}"
-    }
-
-    # Provisioner to copy apache conf file 
-    
-    provisioner "file" {
-         source      = "conf/apache-overrides.conf"
-         destination = "/tmp/apache-overrides.conf"
-    }
-    
-    # add remote exec provisioner to be able to copy file with correct permision 
-    provisioner "remote-exec" {
-      inline = [
-        "sudo chown root:root /tmp/apache-overrides.conf",
-        "sudo mv /tmp/apache-overrides.conf /etc/httpd/conf.d/apache-overrides.conf",
-      ]
-    }
-
-    # provisioner to copy index.html and restart apache 
-
-  provisioner "file" {
-       source      = "conf/index.html"
-       destination = "/tmp/index.html"
-  }
-  
-  # add remote exec provisioner to be able to copy file with correct permision 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo chown root:root /tmp/index.html",
-      "sudo mv /tmp/index.html /var/www/html/web/www/index.html",
-      "sudo systemctl restart httpd",
-    ]
-  }
-
-  depends_on = ["aws_security_group.testappserver1-sg"]
-
-}
 
 # Create keypair to add ssh key to the instance
 # skip if already created on aws
